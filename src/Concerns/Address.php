@@ -47,7 +47,7 @@ trait Address
             ->deriveChild($index);
         $privateKey = (string)$hdKey->privateKey;
 
-        $addressString = (new \kornrunner\Ethereum\Address($privateKey))->get();
+        $addressString = '0x'.(new \kornrunner\Ethereum\Address($privateKey))->get();
 
         /** @var class-string<EthereumAddress> $addressModel */
         $addressModel = Ethereum::getModel(EthereumModel::Address);
