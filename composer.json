@@ -1,0 +1,23 @@
+{
+    "name": "mollsoft/laravel-ethereum-module",
+    "description": "Ethereum Wallet module for Laravel",
+    "type": "library",
+    "require": {
+        "spatie/laravel-package-tools": "1.92.0",
+        "brick/math": "^0.12.3",
+        "furqansiddiqui/bip39-mnemonic-php": "^0.2.1",
+        "minter/minter-php-bip-44": "^1.2",
+        "kornrunner/ethereum-address": "^0.3.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Mollsoft\\LaravelEthereumModule\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "MollSoft"
+        }
+    ]
+}
