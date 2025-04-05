@@ -7,7 +7,8 @@
         "brick/math": "*",
         "furqansiddiqui/bip39-mnemonic-php": "^0.2.1",
         "minter/minter-php-bip-44": "^1.2",
-        "kornrunner/ethereum-address": "^0.3.0"
+        "kornrunner/ethereum-address": "^0.3.0",
+        "kornrunner/ethereum-offline-raw-tx": "^0.8.0"
     },
     "license": "MIT",
     "autoload": {
