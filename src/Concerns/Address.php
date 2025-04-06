@@ -3,10 +3,12 @@
 namespace Mollsoft\LaravelEthereumModule\Concerns;
 
 use BIP\BIP44;
+use Brick\Math\BigDecimal;
 use kornrunner\Keccak;
 use Mollsoft\LaravelEthereumModule\Enums\EthereumModel;
 use Mollsoft\LaravelEthereumModule\Facades\Ethereum;
 use Mollsoft\LaravelEthereumModule\Models\EthereumAddress;
+use Mollsoft\LaravelEthereumModule\Models\EthereumToken;
 use Mollsoft\LaravelEthereumModule\Models\EthereumWallet;
 
 trait Address
@@ -48,6 +50,7 @@ trait Address
         $privateKey = (string)$hdKey->privateKey;
 
         $addressString = '0x'.(new \kornrunner\Ethereum\Address($privateKey))->get();
+        $addressString = Ethereum::toChecksumAddress($addressString);
 
         /** @var class-string<EthereumAddress> $addressModel */
         $addressModel = Ethereum::getModel(EthereumModel::Address);
@@ -93,5 +96,34 @@ trait Address
         }
 
         return true;
+    }
+
+    public function toChecksumAddress(string $address): string
+    {
+        $address = strtolower(str_replace('0x', '', $address));
+        $hash = Keccak::hash($address, 256);
+
+        $checksum = '0x';
+
+        for ($i = 0; $i < strlen($address); $i++) {
+            $char = $address[$i];
+            $checksum .= (hexdec($hash[$i]) >= 8) ? strtoupper($char) : $char;
+        }
+
+        return $checksum;
+    }
+
+    public function getBalance(string|EthereumAddress $address): BigDecimal
+    {
+        $node = $address instanceof EthereumAddress ? $address->wallet->node : Ethereum::getNode();
+
+        return $node->getBalance($address);
+    }
+
+    public function getBalanceOfToken(string|EthereumAddress $address, string|EthereumToken $contract): BigDecimal
+    {
+        $node = $address instanceof EthereumAddress ? $address->wallet->node : Ethereum::getNode();
+
+        return $node->getBalanceOfToken($address, $contract);
     }
 }

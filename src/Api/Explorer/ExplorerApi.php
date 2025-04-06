@@ -2,9 +2,11 @@
 
 namespace Mollsoft\LaravelEthereumModule\Api\Explorer;
 
+use Closure;
 use Illuminate\Support\Facades\Http;
 use Mollsoft\LaravelEthereumModule\Api\DTOPaginator;
 use Mollsoft\LaravelEthereumModule\Api\Explorer\DTO\ApiLimitDTO;
+use Mollsoft\LaravelEthereumModule\Api\Explorer\DTO\GasOracleDTO;
 use Mollsoft\LaravelEthereumModule\Api\Explorer\DTO\TokenTransactionDTO;
 use Mollsoft\LaravelEthereumModule\Api\Explorer\DTO\TransactionDTO;
 
@@ -56,10 +58,14 @@ class ExplorerApi
     /**
      * @return DTOPaginator<TransactionDTO>
      */
-    public function getTransactionsPaginator(string $address, int $startBlock = 0, int $perPage = 10): DTOPaginator
+    public function getTransactionsPaginator(string $address, int $startBlock = 0, int $perPage = 10, ?Closure $callback = null): DTOPaginator
     {
         return new DTOPaginator(
-            callback: function (int $page) use ($address, $startBlock, $perPage) {
+            callback: function (int $page) use ($address, $startBlock, $perPage, $callback) {
+                if( is_callable($callback) ) {
+                    $callback();
+                }
+
                 return $this->getTransactions($address, $startBlock, $perPage, $page);
             },
             perPage: $perPage
@@ -104,9 +110,14 @@ class ExplorerApi
         ?string $contract = null,
         int $startBlock = 0,
         int $perPage = 10,
+        ?Closure $callback = null
     ): DTOPaginator {
         return new DTOPaginator(
-            callback: function (int $page) use ($address, $contract, $startBlock, $perPage) {
+            callback: function (int $page) use ($address, $contract, $startBlock, $perPage, $callback) {
+                if( is_callable($callback) ) {
+                    $callback();
+                }
+
                 return $this->getTransactionsOfToken($address, $contract, $startBlock, $perPage, $page);
             },
             perPage: $perPage
@@ -121,5 +132,16 @@ class ExplorerApi
         ]);
 
         return ApiLimitDTO::make($data);
+    }
+
+    public function getGasOracle(): GasOracleDTO
+    {
+        $data = $this->request([
+            'chainid' => 1,
+            'module' => 'gastracker',
+            'action' => 'gasoracle',
+        ]);
+
+        return GasOracleDTO::make($data);
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Mollsoft\LaravelEthereumModule\Concerns;
 
+use Mollsoft\LaravelEthereumModule\Api\Explorer\DTO\GasOracleDTO;
 use Mollsoft\LaravelEthereumModule\Enums\EthereumModel;
 use Mollsoft\LaravelEthereumModule\Facades\Ethereum;
 use Mollsoft\LaravelEthereumModule\Models\EthereumExplorer;
-use Mollsoft\LaravelEthereumModule\Models\EthereumNode;
 
 trait Explorer
 {
@@ -28,7 +28,7 @@ trait Explorer
         return $explorer;
     }
 
-    public function createEtherscanExplorer(string $apiKey, string $name, ?string $title = null): EthereumNode
+    public function createEtherscanExplorer(string $apiKey, string $name, ?string $title = null): EthereumExplorer
     {
         /** @var class-string<EthereumExplorer> $explorerModel */
         $explorerModel = Ethereum::getModel(EthereumModel::Explorer);
@@ -53,5 +53,10 @@ trait Explorer
             ->where('worked', '=', true)
             ->orderBy('requests')
             ->firstOrFail();
+    }
+
+    public function getGasOracle(): GasOracleDTO
+    {
+        return $this->getExplorer()->api()->getGasOracle();
     }
 }

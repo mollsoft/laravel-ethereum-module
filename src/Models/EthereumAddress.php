@@ -5,6 +5,7 @@ namespace Mollsoft\LaravelEthereumModule\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Mollsoft\LaravelEthereumModule\Casts\BigDecimalCast;
 use Mollsoft\LaravelEthereumModule\Casts\EncryptedCast;
 use Mollsoft\LaravelEthereumModule\Enums\EthereumModel;
@@ -22,6 +23,8 @@ class EthereumAddress extends Model
         'balance',
         'tokens',
         'touch_at',
+        'sync_at',
+        'sync_block_number',
     ];
 
     protected $appends = [
@@ -41,6 +44,8 @@ class EthereumAddress extends Model
             'balance' => BigDecimalCast::class,
             'tokens' => 'array',
             'touch_at' => 'datetime',
+            'sync_at' => 'datetime',
+            'sync_block_number' => 'integer',
         ];
     }
 
@@ -70,5 +75,13 @@ class EthereumAddress extends Model
     public function wallet(): BelongsTo
     {
         return $this->belongsTo(EthereumWallet::class);
+    }
+
+    public function deposits(): HasMany
+    {
+        /** @var class-string<EthereumDeposit> $model */
+        $model = Ethereum::getModel(EthereumModel::Deposit);
+
+        return $this->hasMany($model, 'address_id');
     }
 }

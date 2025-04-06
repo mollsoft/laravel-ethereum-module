@@ -2,6 +2,7 @@
 
 namespace Mollsoft\LaravelEthereumModule\Concerns;
 
+use Illuminate\Support\Str;
 use Mollsoft\LaravelEthereumModule\Enums\EthereumModel;
 use Mollsoft\LaravelEthereumModule\Facades\Ethereum;
 use Mollsoft\LaravelEthereumModule\Models\EthereumNode;
@@ -11,6 +12,8 @@ trait Token
 {
     public function createToken(string $contract, ?EthereumNode $node = null)
     {
+        $contract = Str::lower($contract);
+
         if( !$node ) {
             $node = Ethereum::getNode();
         }

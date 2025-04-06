@@ -2,6 +2,7 @@
 
 namespace Mollsoft\LaravelEthereumModule\Models;
 
+use Brick\Math\BigDecimal;
 use Illuminate\Database\Eloquent\Model;
 use Mollsoft\LaravelEthereumModule\Api\Node\NodeApi;
 
@@ -38,5 +39,43 @@ class EthereumNode extends Model
         }
 
         return $this->_api;
+    }
+
+    public function getLatestBlockNumber(): int
+    {
+        $result = $this->api()->getLatestBlockNumber();
+
+        $this->increment('requests');
+
+        return $result;
+    }
+
+    public function getBalance(string|EthereumAddress $address): BigDecimal
+    {
+        if( $address instanceof EthereumAddress ) {
+            $address = $address->address;
+        }
+
+        $result = $this->api()->getBalance($address);
+
+        $this->increment('requests');
+
+        return $result;
+    }
+
+    public function getBalanceOfToken(string|EthereumAddress $address, string|EthereumToken $contract): BigDecimal
+    {
+        if( $address instanceof EthereumAddress ) {
+            $address = $address->address;
+        }
+        if( $contract instanceof EthereumToken ) {
+            $contract = $contract->address;
+        }
+
+        $result = $this->api()->getBalanceOfToken($address, $contract);
+
+        $this->increment('requests');
+
+        return $result;
     }
 }

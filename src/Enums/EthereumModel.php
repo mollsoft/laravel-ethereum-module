@@ -9,4 +9,6 @@ enum EthereumModel: string
     case Token = 'token';
     case Wallet = 'wallet';
     case Address = 'address';
+    case Transaction = 'transaction';
+    case Deposit = 'deposit';
 }

@@ -8,6 +8,7 @@ use Mollsoft\LaravelEthereumModule\Concerns\Explorer;
 use Mollsoft\LaravelEthereumModule\Concerns\Mnemonic;
 use Mollsoft\LaravelEthereumModule\Concerns\Node;
 use Mollsoft\LaravelEthereumModule\Concerns\Token;
+use Mollsoft\LaravelEthereumModule\Concerns\Transfer;
 use Mollsoft\LaravelEthereumModule\Concerns\Wallet;
 use Mollsoft\LaravelEthereumModule\Enums\EthereumModel;
 use Mollsoft\LaravelEthereumModule\Models\EthereumExplorer;
@@ -15,7 +16,7 @@ use Mollsoft\LaravelEthereumModule\Models\EthereumNode;
 
 class Ethereum
 {
-    use Node, Explorer, Token, Mnemonic, Address, Wallet;
+    use Node, Explorer, Token, Mnemonic, Address, Wallet, Transfer;
 
     /**
      * @param EthereumModel $model

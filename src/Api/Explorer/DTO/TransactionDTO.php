@@ -5,6 +5,7 @@ namespace Mollsoft\LaravelEthereumModule\Api\Explorer\DTO;
 use Brick\Math\BigDecimal;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 use Mollsoft\LaravelEthereumModule\Api\BaseDTO;
 
 class TransactionDTO extends BaseDTO
@@ -28,12 +29,12 @@ class TransactionDTO extends BaseDTO
 
     public function from(): string
     {
-        return (string)$this->getOrFail('from');
+        return Str::lower($this->getOrFail('from'));
     }
 
     public function to(): string
     {
-        return (string)$this->getOrFail('to');
+        return Str::lower($this->getOrFail('to'));
     }
 
     public function amount(): BigDecimal
@@ -70,7 +71,9 @@ class TransactionDTO extends BaseDTO
 
     public function contractAddress(): ?string
     {
-        return $this->get('contractAddress');
+        $value = $this->get('contractAddress');
+
+        return $value ? Str::lower($value) : null;
     }
 
     public function confirmations(): int
