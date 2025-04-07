@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->timestamp('time_at');
             $table->string('from');
             $table->string('to');
-            $table->decimal('amount');
+            $table->decimal('amount', 30, 18);
             $table->string('token_address')->nullable();
             $table->bigInteger('block_number')->nullable();
             $table->json('data');
