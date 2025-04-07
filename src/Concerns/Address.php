@@ -113,6 +113,12 @@ trait Address
         return $checksum;
     }
 
+    public function privateKeyToAddress(string $privateKey): string
+    {
+        $hex = '0x'.(new \kornrunner\Ethereum\Address($privateKey))->get();
+        return $this->toChecksumAddress($hex);
+    }
+
     public function getBalance(string|EthereumAddress $address): BigDecimal
     {
         $node = $address instanceof EthereumAddress ? $address->wallet->node : Ethereum::getNode();
