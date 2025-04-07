@@ -26,7 +26,6 @@ class EthereumServiceProvider extends PackageServiceProvider
                 EthereumSyncCommand::class,
             )
             ->discoversMigrations()
-            ->runsMigrations()
             ->hasInstallCommand(function(InstallCommand $command) {
                 $command
                     ->publishConfigFile()
