@@ -30,7 +30,9 @@ class EthereumServiceProvider extends PackageServiceProvider
             ->hasInstallCommand(function(InstallCommand $command) {
                 $command
                     ->publishConfigFile()
-                    ->publishMigrations();
+                    ->publishMigrations()
+                    ->askToRunMigrations()
+                    ->askToStarRepoOnGitHub('mollsoft/laravel-ethereum-module');
             });
 
         $this->app->singleton(Ethereum::class);

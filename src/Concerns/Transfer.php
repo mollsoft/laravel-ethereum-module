@@ -4,6 +4,7 @@ namespace Mollsoft\LaravelEthereumModule\Concerns;
 
 use Brick\Math\BigDecimal;
 use Mollsoft\LaravelEthereumModule\Api\Node\DTO\PreviewTransferDTO;
+use Mollsoft\LaravelEthereumModule\Api\Node\DTO\TransferDTO;
 use Mollsoft\LaravelEthereumModule\Facades\Ethereum;
 use Mollsoft\LaravelEthereumModule\Models\EthereumAddress;
 use Mollsoft\LaravelEthereumModule\Models\EthereumToken;
@@ -13,10 +14,12 @@ trait Transfer
     public function previewTransfer(
         EthereumAddress $from,
         EthereumAddress|string $to,
-        BigDecimal|float|int|string $amount
+        BigDecimal|float|int|string $amount,
+        ?BigDecimal $balanceBefore = null,
+        ?int $gasLimit = null
     ): PreviewTransferDTO {
         $node = $from->wallet->node ?? Ethereum::getNode();
-        $node->increment('requests', 2);
+        $node->increment('requests', 2 + ($balanceBefore === null ? 1 : 0));
         $api = $node->api();
 
         if ($to instanceof EthereumAddress) {
@@ -28,6 +31,34 @@ trait Transfer
             from: $from->address,
             to: $to,
             amount: $amount,
+            balanceBefore: $balanceBefore,
+            gasLimit: $gasLimit
+        );
+    }
+
+    public function transfer(
+        EthereumAddress $from,
+        EthereumAddress|string $to,
+        BigDecimal|float|int|string $amount,
+        ?BigDecimal $balanceBefore = null,
+        ?int $gasLimit = null
+    ): TransferDTO {
+        $node = $from->wallet->node ?? Ethereum::getNode();
+        $node->increment('requests', 3 + ($balanceBefore === null ? 1 : 0));
+        $api = $node->api();
+
+        if ($to instanceof EthereumAddress) {
+            $to = $to->address;
+        }
+        $amount = BigDecimal::of($amount);
+
+        return $api->transfer(
+            from: $from->address,
+            to: $to,
+            privateKey: $from->private_key,
+            amount: $amount,
+            balanceBefore: $balanceBefore,
+            gasLimit: $gasLimit,
         );
     }
 
@@ -35,10 +66,13 @@ trait Transfer
         EthereumToken|string $contract,
         EthereumAddress $from,
         EthereumAddress|string $to,
-        BigDecimal|float|int|string $amount
+        BigDecimal|float|int|string $amount,
+        ?BigDecimal $balanceBefore = null,
+        ?BigDecimal $tokenBalanceBefore = null,
+        ?int $gasLimit = null,
     ): PreviewTransferDTO {
         $node = $from->wallet->node ?? Ethereum::getNode();
-        $node->increment('requests', 3);
+        $node->increment('requests', 3 + ($balanceBefore === null ? 1 : 0) + ($tokenBalanceBefore === null ? 1 : 0));
         $api = $node->api();
 
         if ($contract instanceof EthereumToken) {
@@ -54,29 +88,8 @@ trait Transfer
             from: $from->address,
             to: $to,
             amount: $amount,
-        );
-    }
-
-    public function transfer(
-        EthereumAddress $from,
-        EthereumAddress|string $to,
-        BigDecimal|float|int|string $amount,
-        int $gasLimit = 25000
-    ): string {
-        $node = $from->wallet->node ?? Ethereum::getNode();
-        $node->increment('requests', 3);
-        $api = $node->api();
-
-        if ($to instanceof EthereumAddress) {
-            $to = $to->address;
-        }
-        $amount = BigDecimal::of($amount);
-
-        return $api->transfer(
-            from: $from->address,
-            to: $to,
-            privateKey: $from->private_key,
-            amount: $amount,
+            balanceBefore: $balanceBefore,
+            tokenBalanceBefore: $tokenBalanceBefore,
             gasLimit: $gasLimit,
         );
     }
@@ -86,10 +99,12 @@ trait Transfer
         EthereumAddress $from,
         EthereumAddress|string $to,
         BigDecimal|float|int|string $amount,
-        int $gasLimit = 50000
-    ): string {
+        ?BigDecimal $balanceBefore = null,
+        ?BigDecimal $tokenBalanceBefore = null,
+        ?int $gasLimit = null,
+    ): TransferDTO {
         $node = $from->wallet->node ?? Ethereum::getNode();
-        $node->increment('requests', 4);
+        $node->increment('requests', 4 + ($balanceBefore === null ? 1 : 0) + ($tokenBalanceBefore === null ? 1 : 0));
         $api = $node->api();
 
         if ($contract instanceof EthereumToken) {
@@ -106,6 +121,8 @@ trait Transfer
             to: $to,
             privateKey: $from->private_key,
             amount: $amount,
+            balanceBefore: $balanceBefore,
+            tokenBalanceBefore: $tokenBalanceBefore,
             gasLimit: $gasLimit,
         );
     }

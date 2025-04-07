@@ -1,10 +1,24 @@
 {
     "name": "mollsoft/laravel-ethereum-module",
-    "description": "Ethereum Wallet module for Laravel",
+    "description": "Laravel Ethereum Module",
+    "homepage": "https://github.com/mollsoft/laravel-ethereum-module",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "MollSoft",
+            "email": "info@mollsoft.com"
+        }
+    ],
+    "keywords": [
+        "mollsoft",
+        "laravel",
+        "ethereum"
+    ],
     "type": "library",
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-gmp": "*",
+        "illuminate/contracts": "^10.0|^11.0|^12.0",
         "spatie/laravel-package-tools": "1.92.0",
         "brick/math": "*",
         "furqansiddiqui/bip39-mnemonic-php": "^0.2.1",
@@ -12,15 +26,21 @@
         "kornrunner/ethereum-address": "^0.3.0",
         "kornrunner/ethereum-offline-raw-tx": "^0.8.0"
     },
-    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Mollsoft\\LaravelEthereumModule\\": "src/"
         }
     },
-    "authors": [
-        {
-            "name": "MollSoft"
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mollsoft\\LaravelEthereumModule\\EthereumServiceProvider"
+            ],
+            "aliases": {
+                "Ethereum": "Mollsoft\\LaravelEthereumModule\\Facades\\Ethereum"
+            }
         }
-    ]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
