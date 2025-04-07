@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Mollsoft\LaravelEthereumModule\Casts\EncryptedCast;
 use Mollsoft\LaravelEthereumModule\Enums\EthereumModel;
 use Mollsoft\LaravelEthereumModule\Facades\Ethereum;
@@ -94,5 +95,23 @@ class EthereumWallet extends Model
         $model = Ethereum::getModel(EthereumModel::Address);
 
         return $this->hasMany($model, 'wallet_id');
+    }
+
+    public function transactions(): HasManyThrough
+    {
+        /** @var class-string<EthereumTransaction> $transactionModel */
+        $transactionModel = Ethereum::getModel(EthereumModel::Transaction);
+
+        /** @var class-string<EthereumAddress> $addressModel */
+        $addressModel = Ethereum::getModel(EthereumModel::Address);
+
+        return $this->hasManyThrough(
+            $transactionModel,
+            $addressModel,
+            'wallet_id',
+            'address',
+            'id',
+            'address'
+        );
     }
 }

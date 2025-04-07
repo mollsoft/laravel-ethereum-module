@@ -84,4 +84,12 @@ class EthereumAddress extends Model
 
         return $this->hasMany($model, 'address_id');
     }
+
+    public function transactions(): HasMany
+    {
+        /** @var class-string<EthereumTransaction> $model */
+        $model = Ethereum::getModel(EthereumModel::Transaction);
+
+        return $this->hasMany($model, 'address', 'address');
+    }
 }

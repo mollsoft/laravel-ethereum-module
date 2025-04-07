@@ -33,6 +33,10 @@ class ExplorerApi
             throw new \Exception($result['error']['message'] ?? $result['error']);
         }
 
+        if( count($result ?? []) === 0 ) {
+            throw new \Exception($response->body());
+        }
+
         return $result['status'] === '1' ? $result['result'] : [];
     }
 
