@@ -36,7 +36,7 @@ class NodeApi
             throw new \Exception($result['error']['message']);
         }
 
-        if( count($result ?? []) === 0 ) {
+        if( count($result ?? []) === 0 || !isset( $result['result'] ) ) {
             throw new \Exception($response->body());
         }
 
