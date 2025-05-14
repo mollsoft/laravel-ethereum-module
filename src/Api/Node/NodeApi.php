@@ -60,7 +60,7 @@ class NodeApi
             'latest'
         ]);
 
-        return hex2bin(substr($hex, 130));
+        return trim(hex2bin(substr($hex, 130)), "\0");
     }
 
     public function getTokenSymbol(string $contract): ?string
@@ -73,7 +73,7 @@ class NodeApi
             'latest'
         ]);
 
-        return hex2bin(substr($hex, 130));
+        return trim(hex2bin(substr($hex, 130)), "\0");
     }
 
     public function getTokenDecimals(string $contract): int
