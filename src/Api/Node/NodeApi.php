@@ -6,7 +6,6 @@ use Brick\Math\BigDecimal;
 use Brick\Math\BigInteger;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use kornrunner\Ethereum\Token;
 use kornrunner\Ethereum\Transaction;
 use Mollsoft\LaravelEthereumModule\Api\Node\DTO\PreviewTransferDTO;
 use Mollsoft\LaravelEthereumModule\Api\Node\DTO\TransferDTO;
@@ -14,16 +13,26 @@ use Mollsoft\LaravelEthereumModule\Api\Node\DTO\TransferDTO;
 class NodeApi
 {
     protected string $baseURL;
+    protected ?string $proxy;
     protected array $tokenDecimals = [];
 
-    public function __construct(string $baseURL)
+    public function __construct(string $baseURL, ?string $proxy = null)
     {
         $this->baseURL = $baseURL;
+        $this->proxy = $this->formatProxy($proxy);
     }
 
     public function rpc(string $method, array $params = []): mixed
     {
-        $response = Http::post($this->baseURL, [
+        $client = Http::asJson()
+            ->acceptJson()
+            ->withOptions([
+                'base_uri' => $this->baseURL,
+                'timeout' => 60,
+                'proxy' => $this->proxy,
+            ]);
+
+        $response = $client->post('', [
             'jsonrpc' => '2.0',
             'method' => $method,
             'params' => $params,
@@ -41,6 +50,36 @@ class NodeApi
         }
 
         return $result['result'];
+    }
+
+    protected function formatProxy(?string $proxy): ?string
+    {
+        if (!$proxy) {
+            return null;
+        }
+
+        if (preg_match('/^(socks4|socks5|https?|http):\/\/(([^:]+):([^@]+)@)?([^:\/]+)(:\d+)?$/', $proxy, $matches)) {
+            $protocol = $matches[1];
+            $username = $matches[3] ?? null;
+            $password = $matches[4] ?? null;
+            $host = $matches[5];
+            $port = $matches[6] ?? '';
+
+            if (in_array($protocol, ['socks4', 'socks5'])) {
+                if ($username && $password) {
+                    return "{$protocol}://{$username}:{$password}@{$host}{$port}";
+                }
+                return "{$protocol}://{$host}{$port}";
+            }
+
+            if ($username && $password) {
+                return "{$protocol}://{$username}:{$password}@{$host}{$port}";
+            }
+
+            return "{$protocol}://{$host}{$port}";
+        }
+
+        throw new \InvalidArgumentException('Invalid proxy format. Supported formats: socks4|socks5|http|https.');
     }
 
     public function getBalance(string $address): BigDecimal

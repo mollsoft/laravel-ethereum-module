@@ -15,11 +15,13 @@ class EthereumNode extends Model
         'name',
         'title',
         'base_url',
+        'proxy',
         'sync_at',
         'sync_data',
         'requests',
         'requests_at',
         'worked',
+        'available',
     ];
 
     protected function casts(): array
@@ -29,13 +31,14 @@ class EthereumNode extends Model
             'sync_data' => 'array',
             'requests_at' => 'date',
             'worked' => 'boolean',
+            'available' => 'boolean',
         ];
     }
 
     public function api(): NodeApi
     {
         if( !$this->_api ) {
-            $this->_api = new NodeApi($this->base_url);
+            $this->_api = new NodeApi($this->base_url, $this->proxy);
         }
 
         return $this->_api;

@@ -16,11 +16,13 @@ class EthereumExplorer extends Model
         'title',
         'base_url',
         'api_key',
+        'proxy',
         'sync_at',
         'sync_data',
         'requests',
         'requests_at',
         'worked',
+        'available',
     ];
 
     protected function casts(): array
@@ -30,6 +32,7 @@ class EthereumExplorer extends Model
             'sync_data' => 'array',
             'requests_at' => 'date',
             'worked' => 'boolean',
+            'available' => 'boolean',
         ];
     }
 
@@ -38,7 +41,8 @@ class EthereumExplorer extends Model
         if (!$this->_api) {
             $this->_api = new ExplorerApi(
                 $this->base_url,
-                $this->api_key
+                $this->api_key,
+                $this->proxy,
             );
         }
 

@@ -8,7 +8,7 @@ use Mollsoft\LaravelEthereumModule\Models\EthereumNode;
 
 trait Node
 {
-    public function createNode(string $name, string $baseURL, ?string $title = null): EthereumNode
+    public function createNode(string $name, string $baseURL, ?string $title = null, ?string $proxy = null): EthereumNode
     {
         /** @var class-string<EthereumNode> $nodeModel */
         $nodeModel = Ethereum::getModel(EthereumModel::Node);
@@ -16,6 +16,7 @@ trait Node
             'name' => $name,
             'title' => $title,
             'base_url' => $baseURL,
+            'proxy' => $proxy,
             'requests' => 1,
             'worked' => true,
         ]);
@@ -26,7 +27,7 @@ trait Node
         return $node;
     }
 
-    public function createInfuraNode(string $apiKey, string $name, ?string $title = null): EthereumNode
+    public function createInfuraNode(string $apiKey, string $name, ?string $title = null, ?string $proxy = null): EthereumNode
     {
         /** @var class-string<EthereumNode> $nodeModel */
         $nodeModel = Ethereum::getModel(EthereumModel::Node);
@@ -35,6 +36,7 @@ trait Node
             'name' => $name,
             'title' => $title,
             'base_url' => 'https://mainnet.infura.io/v3/'.$apiKey,
+            'proxy' => $proxy,
             'requests' => 1,
             'worked' => true,
         ]);

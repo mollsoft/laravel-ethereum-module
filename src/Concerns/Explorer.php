@@ -9,7 +9,7 @@ use Mollsoft\LaravelEthereumModule\Models\EthereumExplorer;
 
 trait Explorer
 {
-    public function createExplorer(string $name, string $baseURL, string $apiKey, ?string $title = null): EthereumExplorer
+    public function createExplorer(string $name, string $baseURL, string $apiKey, ?string $title = null, ?string $proxy = null): EthereumExplorer
     {
         /** @var class-string<EthereumExplorer> $explorerModel */
         $explorerModel = Ethereum::getModel(EthereumModel::Explorer);
@@ -18,6 +18,7 @@ trait Explorer
             'title' => $title,
             'base_url' => $baseURL,
             'api_key' => $apiKey,
+            'proxy' => $proxy,
             'requests' => 1,
             'worked' => true,
         ]);
@@ -28,7 +29,7 @@ trait Explorer
         return $explorer;
     }
 
-    public function createEtherscanExplorer(string $apiKey, string $name, ?string $title = null): EthereumExplorer
+    public function createEtherscanExplorer(string $apiKey, string $name, ?string $title = null, ?string $proxy = null): EthereumExplorer
     {
         /** @var class-string<EthereumExplorer> $explorerModel */
         $explorerModel = Ethereum::getModel(EthereumModel::Explorer);
@@ -37,6 +38,7 @@ trait Explorer
             'title' => $title,
             'base_url' => 'https://api.etherscan.io/api',
             'api_key' => $apiKey,
+            'proxy' => $proxy,
             'requests' => 1,
             'worked' => true,
         ]);

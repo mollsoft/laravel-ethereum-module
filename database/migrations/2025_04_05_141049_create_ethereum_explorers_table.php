@@ -13,11 +13,13 @@ return new class extends Migration {
             $table->string('title')->nullable();
             $table->string('base_url');
             $table->string('api_key')->nullable();
+            $table->string('proxy')->nullable();
             $table->dateTime('sync_at')->nullable();
             $table->json('sync_data')->nullable();
             $table->bigInteger('requests')->default(0);
             $table->date('requests_at')->nullable();
             $table->boolean('worked')->default(true);
+            $table->boolean('available')->default(true);
         });
     }
 

@@ -31,6 +31,7 @@ class Ethereum
     {
         return $this->getModel(EthereumModel::Node)::query()
             ->where('worked', '=', true)
+            ->where('available', '=', true)
             ->orderBy('requests')
             ->firstOrFail();
     }
@@ -39,6 +40,7 @@ class Ethereum
     {
         return $this->getModel(EthereumModel::Explorer)::query()
             ->where('worked', '=', true)
+            ->where('available', '=', true)
             ->orderBy('requests')
             ->firstOrFail();
     }

@@ -28,6 +28,7 @@ class EthereumSync extends BaseSync
         $model = Ethereum::getModel(EthereumModel::Node);
 
         $model::query()
+            ->where('available', true)
             ->orderBy('sync_at')
             ->orderBy('name')
             ->each(function (EthereumNode $node) {
@@ -51,6 +52,7 @@ class EthereumSync extends BaseSync
         $model = Ethereum::getModel(EthereumModel::Explorer);
 
         $model::query()
+            ->where('available', true)
             ->orderBy('sync_at')
             ->orderBy('name')
             ->each(function (EthereumExplorer $explorer) {
