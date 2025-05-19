@@ -23,6 +23,7 @@ return new class extends Migration {
             $table->timestamp('touch_at')->nullable();
             $table->timestamp('sync_at')->nullable();
             $table->bigInteger('sync_block_number')->nullable();
+            $table->boolean('available')->default(true);
             $table->timestamps();
 
             $table->unique(['wallet_id', 'address']);

@@ -25,6 +25,7 @@ class EthereumAddress extends Model
         'touch_at',
         'sync_at',
         'sync_block_number',
+        'available',
     ];
 
     protected $appends = [
@@ -46,6 +47,7 @@ class EthereumAddress extends Model
             'touch_at' => 'datetime',
             'sync_at' => 'datetime',
             'sync_block_number' => 'integer',
+            'available' => 'boolean',
         ];
     }
 
