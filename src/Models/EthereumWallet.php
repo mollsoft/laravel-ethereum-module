@@ -30,6 +30,9 @@ class EthereumWallet extends Model
 
     protected $appends = [
         'tokens_balances',
+        'has_password',
+        'has_mnemonic',
+        'has_seed',
     ];
 
     protected $hidden = [
@@ -113,5 +116,20 @@ class EthereumWallet extends Model
             'id',
             'address'
         );
+    }
+
+    public function getHasPasswordAttribute(): bool
+    {
+        return !!$this->password;
+    }
+
+    public function getHasMnemonicAttribute(): bool
+    {
+        return !!$this->mnemonic;
+    }
+
+    public function getHasSeedAttribute(): bool
+    {
+        return !!$this->seed;
     }
 }
