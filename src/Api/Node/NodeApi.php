@@ -387,4 +387,135 @@ class NodeApi
             'txid' => $txid,
         ]);
     }
+
+    public function previewTransferFromToken(
+        string $contract,
+        string $from,
+        string $to,
+        BigDecimal $amount,
+        ?BigDecimal $balanceBefore = null,
+        ?BigDecimal $tokenBalanceBefore = null,
+        ?int $gasLimit = null
+    ): PreviewTransferDTO {
+        $contract = Str::lower($contract);
+        $from = Str::lower($from);
+        $to = Str::lower($to);
+
+        // Получаем количество десятичных знаков для токена
+        $decimals = $this->tokenDecimals[$contract] ??= $this->getTokenDecimals($contract);
+
+        // Если баланс токенов не передан, получаем его
+        if ($tokenBalanceBefore === null) {
+            $tokenBalanceBefore = $this->getBalanceOfToken($from, $contract);
+        }
+
+        $tokenBalanceAfter = $tokenBalanceBefore->minus($amount);
+
+        // Если баланс ETH не передан, получаем его
+        if ($balanceBefore === null) {
+            $balanceBefore = $this->getBalance($from);
+        }
+
+        if ($tokenBalanceAfter->isNegative()) {
+            return PreviewTransferDTO::make([
+                'contract' => $contract,
+                'from' => $from,
+                'to' => $to,
+                'amount' => $amount->__toString(),
+                'data' => '',
+                'gas_price' => 0,
+                'gas_limit' => 0,
+                'fee' => 0,
+                'balance_before' => $balanceBefore->__toString(),
+                'balance_after' => $balanceBefore->__toString(),
+                'token_balance_before' => $tokenBalanceBefore->__toString(),
+                'token_balance_after' => $tokenBalanceAfter->__toString(),
+                'error' => 'Недостаточно баланса токена',
+            ]);
+        }
+
+        // Код для метода transferFrom (вместо transfer)
+        $data = '0x23b872dd' // Хеш для transferFrom
+            .substr($from, 2)  // Адрес отправителя
+            .substr($to, 2)    // Адрес получателя
+            .str_pad(
+                $amount->multipliedBy(pow(10, $decimals))->toBigInteger()->toBase(16),
+                64,
+                '0',
+                STR_PAD_LEFT
+            );
+
+        $gasPrice = $this->gasPrice();
+        $gasEstimate = $this->gasEstimate($from, $contract, $data);
+        if( $gasLimit ) {
+            $gasLimit = BigDecimal::of($gasLimit);
+            $gasEstimate = $gasLimit->isLessThan($gasEstimate) ? $gasLimit : $gasEstimate;
+        }
+        $fee = $gasPrice
+            ->multipliedBy($gasEstimate)
+            ->dividedBy(pow(10, 18), 18);
+        $balanceAfter = $balanceBefore->minus($fee);
+
+        $error = null;
+        if ($balanceAfter->isNegative()) {
+            $error = 'Недостаточно баланса ETH';
+        }
+
+        return PreviewTransferDTO::make([
+            'contract' => $contract,
+            'from' => $from,
+            'to' => $to,
+            'amount' => $amount->__toString(),
+            'data' => $data,
+            'gas_price' => $gasPrice->__toString(),
+            'gas_limit' => $gasEstimate->__toString(),
+            'fee' => $fee->__toString(),
+            'balance_before' => $balanceBefore->__toString(),
+            'balance_after' => $balanceAfter->__toString(),
+            'token_balance_before' => $tokenBalanceBefore->__toString(),
+            'token_balance_after' => $tokenBalanceAfter->__toString(),
+            'error' => $error,
+        ]);
+    }
+
+    public function transferFromToken(
+        string $contract,
+        string $from,
+        string $to,
+        string $privateKey,
+        BigDecimal $amount,
+        ?BigDecimal $balanceBefore = null,
+        ?BigDecimal $tokenBalanceBefore = null,
+        ?int $gasLimit = null
+    ): TransferDTO {
+        // Предварительная проверка параметров перевода
+        $preview = $this->previewTransferFromToken($contract, $from, $to, $amount, $balanceBefore, $tokenBalanceBefore, $gasLimit);
+        if ($preview->hasError()) {
+            throw new \Exception($preview->error());
+        }
+
+        // Получаем nonce и готовим данные для транзакции
+        $nonce = $this->rpc('eth_getTransactionCount', [$from, 'pending']);
+        $gasPrice = $preview->gasPrice()->toBigInteger()->toBase(16);
+        $gasLimit = $preview->gasLimit()->toBigInteger()->toBase(16);
+
+        // Формируем транзакцию с методом transferFrom
+        $tx = new Transaction(
+            nonce: substr($nonce, 2),
+            gasPrice: $gasPrice,
+            gasLimit: $gasLimit,
+            to: $preview->contract(),
+            value: '',
+            data: $preview->data()
+        );
+
+        // Подписываем и отправляем транзакцию
+        $raw = '0x' . $tx->getRaw($privateKey, 1);
+        $txid = $this->rpc('eth_sendRawTransaction', [$raw]);
+
+        return TransferDTO::make([
+            ...$preview->toArray(),
+            'txid' => $txid,
+        ]);
+    }
 }
