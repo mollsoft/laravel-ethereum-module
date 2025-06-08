@@ -193,7 +193,7 @@ trait Transfer
 
         return $api->transferFromToken(
             contract: $contract,
-            from: $from->address,
+            from: $from,
             to: $to,
             privateKey: $collector->private_key,
             amount: $amount,
